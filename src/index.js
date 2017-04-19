@@ -12,17 +12,17 @@ function series (arr, Promise, inData) {
   return arr.reduce((promise, item) => {
     if (type(item) === 'function') {
       return promise.then(item)
-    } else if (item.then && type(item.then) === 'function') {
+    } else if (item && item.then && type(item.then) === 'function') {
       return promise.then(() => {
         return item
       })
     } else if (type(item) === 'array') {
       return promise.then(data => {
-        return series(item, data)
+        return series(item, Promise, data)
       })
     } else if (type(item) === 'object') {
       return promise.then(data => {
-        return parallel(item, data)
+        return parallel(item, Promise, data)
       })
     }
 
@@ -44,12 +44,12 @@ function parallel (obj, Promise, inData) {
     const item = obj[key]
     if (type(item) === 'function') {
       return item(inData)
-    } else if (item.then && type(item.then) === 'function') {
+    } else if (item && item.then && type(item.then) === 'function') {
       return item
     } else if (type(item) === 'array') {
-      return series(item, inData)
+      return series(item, Promise, inData)
     } else if (type(item) === 'object') {
-      return parallel(item, inData)
+      return parallel(item, Promise, inData)
     }
 
     return Promise.resolve(null)
