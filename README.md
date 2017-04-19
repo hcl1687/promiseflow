@@ -1,4 +1,5 @@
-#promiseflow
+# promiseflow
+  provides series and parallel flow control for promise
 
 ## install
   npm install promiseflow
