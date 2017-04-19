@@ -7,7 +7,8 @@
 
 ## series demo
 
-![series](https://raw.githubusercontent.com/hcl1687/promiseflow/raw/master/img/series.png)]
+![series](https://raw.githubusercontent.com/hcl1687/promiseflow/master/img/series.png)
+
 ```js
 import runFlow from '../src/index'
 import Promise from 'nd-promise'
