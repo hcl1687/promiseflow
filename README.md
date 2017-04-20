@@ -1,5 +1,10 @@
 # promiseflow
-  provides series and parallel flow control for promise
+  provides series and parallel flow control for promise.
+  use Array to representing tasks in series.
+  use Object to representing tasks in parallel.
+
+  ![series_parallel_input](https://raw.githubusercontent.com/hcl1687/promiseflow/master/img/series_parallel_input.png)
+
 
 ## install
   npm install promiseflow
