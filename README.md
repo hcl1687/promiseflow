@@ -1,7 +1,7 @@
 # promiseflow
   provides series and parallel flow control for promise.
-  useing Array to represent tasks in series.
-  useing Object to represent tasks in parallel.
+  using Array to represent tasks in series.
+  using Object to represent tasks in parallel.
 
   ![series_parallel_input](https://raw.githubusercontent.com/hcl1687/promiseflow/master/img/series_parallel_input.png)
 
