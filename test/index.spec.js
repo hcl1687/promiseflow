@@ -1,5 +1,6 @@
-import runFlow from '../src/index'
+import flowFactory from '../src/index'
 import Promise from 'nd-promise'
+const runFlow = flowFactory(Promise)
 
 describe('test runFlow', function () {
   it('run arr functon immediately', () => {
@@ -12,7 +13,7 @@ describe('test runFlow', function () {
       return data + 2
     }
     const arr = [fun1, fun2]
-    runFlow(arr, Promise, 1)
+    runFlow(arr, 1)
   })
 
   it('run arr function deferred', done => {
@@ -29,7 +30,7 @@ describe('test runFlow', function () {
       })
     }
     const arr = [fun1, fun2]
-    runFlow(arr, Promise, 1).then(data => {
+    runFlow(arr, 1).then(data => {
       expect(data).to.be.equal(4)
       done()
     })
@@ -43,7 +44,7 @@ describe('test runFlow', function () {
       }, 50)
     })
     const arr = [promise1, promise2]
-    runFlow(arr, Promise, 1).then(data => {
+    runFlow(arr, 1).then(data => {
       expect(data).to.be.equal(2)
       done()
     })
@@ -71,7 +72,7 @@ describe('test runFlow', function () {
       })
     }
     const arr = [fun1, [fun2, fun3]]
-    runFlow(arr, Promise, 1).then(data => {
+    runFlow(arr, 1).then(data => {
       expect(data).to.be.equal(7)
       done()
     })
@@ -106,7 +107,7 @@ describe('test runFlow', function () {
     const arr = [fun1, {
       fun2, fun3
     }, fun4]
-    runFlow(arr, Promise, 1).then(data => {
+    runFlow(arr, 1).then(data => {
       expect(data).to.be.equal(9)
       done()
     })
@@ -134,7 +135,7 @@ describe('test runFlow', function () {
       })
     }
     const arr = {fun1, fun2, fun3}
-    let promise = runFlow(arr, Promise, 1)
+    let promise = runFlow(arr, 1)
     promise.then(data => {
       expect(data.fun1).to.be.equal(2)
       expect(data.fun2).to.be.equal(3)
@@ -151,7 +152,7 @@ describe('test runFlow', function () {
       }, 50)
     })
     const arr = { promise1, promise2 }
-    let promise = runFlow(arr, Promise, 1)
+    let promise = runFlow(arr, 1)
     promise.then(data => {
       expect(data.promise1).to.be.equal(1)
       expect(data.promise2).to.be.equal(2)
@@ -184,7 +185,7 @@ describe('test runFlow', function () {
       fun1,
       fun4: { fun2, fun3 }
     }
-    let promise = runFlow(arr, Promise, 1)
+    let promise = runFlow(arr, 1)
     promise.then(data => {
       expect(data.fun1).to.be.equal(2)
       expect(data.fun4.fun2).to.be.equal(3)
@@ -218,7 +219,7 @@ describe('test runFlow', function () {
       fun1,
       fun4: [fun2, fun3]
     }
-    runFlow(arr, Promise, 1).then(data => {
+    runFlow(arr, 1).then(data => {
       expect(data.fun1).to.be.equal(2)
       expect(data.fun4).to.be.equal(6)
       done()
@@ -226,7 +227,7 @@ describe('test runFlow', function () {
   })
 
   it('run null', function (done) {
-    runFlow(null, Promise, 1).then(data => {
+    runFlow(null, 1).then(data => {
       expect(data).to.be.equal(null)
       done()
     })
@@ -234,7 +235,7 @@ describe('test runFlow', function () {
 
   it('run empty arr', function (done) {
     const arr = []
-    runFlow(arr, Promise, 1).then(data => {
+    runFlow(arr, 1).then(data => {
       expect(data).to.be.equal(null)
       done()
     })
@@ -242,7 +243,7 @@ describe('test runFlow', function () {
 
   it('run empty obj', function (done) {
     const arr = {}
-    runFlow(arr, Promise, 1).then(data => {
+    runFlow(arr, 1).then(data => {
       expect(data).to.be.equal(null)
       done()
     })
@@ -250,7 +251,7 @@ describe('test runFlow', function () {
 
   it('run arr item null', function (done) {
     const arr = [null]
-    runFlow(arr, Promise, 1).then(data => {
+    runFlow(arr, 1).then(data => {
       expect(data).to.be.equal(null)
       done()
     })
@@ -260,7 +261,7 @@ describe('test runFlow', function () {
     const arr = {
       fun1: null
     }
-    runFlow(arr, Promise, 1).then(data => {
+    runFlow(arr, 1).then(data => {
       expect(data.fun1).to.be.equal(null)
       done()
     })

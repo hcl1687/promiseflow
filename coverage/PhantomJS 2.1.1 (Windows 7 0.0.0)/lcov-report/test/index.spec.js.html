@@ -22,7 +22,7 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>168/168</span>
+        <span class='fraction'>169/169</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
@@ -37,7 +37,7 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>168/168</span>
+        <span class='fraction'>169/169</span>
       </div>
     </div>
   </div>
@@ -311,8 +311,10 @@
 266
 267
 268
-269</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+269
+270</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-yes">1×</span>
@@ -579,8 +581,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import runFlow from '../src/index'
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import flowFactory from '../src/index'
 import Promise from 'nd-promise'
+const runFlow = flowFactory(Promise)
 &nbsp;
 describe('test runFlow', function () {
   it('run arr functon immediately', () =&gt; {
@@ -593,7 +596,7 @@ describe('test runFlow', function () {
       return data + 2
     }
     const arr = [fun1, fun2]
-    runFlow(arr, Promise, 1)
+    runFlow(arr, 1)
   })
 &nbsp;
   it('run arr function deferred', done =&gt; {
@@ -610,7 +613,7 @@ describe('test runFlow', function () {
       })
     }
     const arr = [fun1, fun2]
-    runFlow(arr, Promise, 1).then(data =&gt; {
+    runFlow(arr, 1).then(data =&gt; {
       expect(data).to.be.equal(4)
       done()
     })
@@ -624,7 +627,7 @@ describe('test runFlow', function () {
       }, 50)
     })
     const arr = [promise1, promise2]
-    runFlow(arr, Promise, 1).then(data =&gt; {
+    runFlow(arr, 1).then(data =&gt; {
       expect(data).to.be.equal(2)
       done()
     })
@@ -652,7 +655,7 @@ describe('test runFlow', function () {
       })
     }
     const arr = [fun1, [fun2, fun3]]
-    runFlow(arr, Promise, 1).then(data =&gt; {
+    runFlow(arr, 1).then(data =&gt; {
       expect(data).to.be.equal(7)
       done()
     })
@@ -687,7 +690,7 @@ describe('test runFlow', function () {
     const arr = [fun1, {
       fun2, fun3
     }, fun4]
-    runFlow(arr, Promise, 1).then(data =&gt; {
+    runFlow(arr, 1).then(data =&gt; {
       expect(data).to.be.equal(9)
       done()
     })
@@ -715,7 +718,7 @@ describe('test runFlow', function () {
       })
     }
     const arr = {fun1, fun2, fun3}
-    let promise = runFlow(arr, Promise, 1)
+    let promise = runFlow(arr, 1)
     promise.then(data =&gt; {
       expect(data.fun1).to.be.equal(2)
       expect(data.fun2).to.be.equal(3)
@@ -732,7 +735,7 @@ describe('test runFlow', function () {
       }, 50)
     })
     const arr = { promise1, promise2 }
-    let promise = runFlow(arr, Promise, 1)
+    let promise = runFlow(arr, 1)
     promise.then(data =&gt; {
       expect(data.promise1).to.be.equal(1)
       expect(data.promise2).to.be.equal(2)
@@ -765,7 +768,7 @@ describe('test runFlow', function () {
       fun1,
       fun4: { fun2, fun3 }
     }
-    let promise = runFlow(arr, Promise, 1)
+    let promise = runFlow(arr, 1)
     promise.then(data =&gt; {
       expect(data.fun1).to.be.equal(2)
       expect(data.fun4.fun2).to.be.equal(3)
@@ -799,7 +802,7 @@ describe('test runFlow', function () {
       fun1,
       fun4: [fun2, fun3]
     }
-    runFlow(arr, Promise, 1).then(data =&gt; {
+    runFlow(arr, 1).then(data =&gt; {
       expect(data.fun1).to.be.equal(2)
       expect(data.fun4).to.be.equal(6)
       done()
@@ -807,7 +810,7 @@ describe('test runFlow', function () {
   })
 &nbsp;
   it('run null', function (done) {
-    runFlow(null, Promise, 1).then(data =&gt; {
+    runFlow(null, 1).then(data =&gt; {
       expect(data).to.be.equal(null)
       done()
     })
@@ -815,7 +818,7 @@ describe('test runFlow', function () {
 &nbsp;
   it('run empty arr', function (done) {
     const arr = []
-    runFlow(arr, Promise, 1).then(data =&gt; {
+    runFlow(arr, 1).then(data =&gt; {
       expect(data).to.be.equal(null)
       done()
     })
@@ -823,7 +826,7 @@ describe('test runFlow', function () {
 &nbsp;
   it('run empty obj', function (done) {
     const arr = {}
-    runFlow(arr, Promise, 1).then(data =&gt; {
+    runFlow(arr, 1).then(data =&gt; {
       expect(data).to.be.equal(null)
       done()
     })
@@ -831,7 +834,7 @@ describe('test runFlow', function () {
 &nbsp;
   it('run arr item null', function (done) {
     const arr = [null]
-    runFlow(arr, Promise, 1).then(data =&gt; {
+    runFlow(arr, 1).then(data =&gt; {
       expect(data).to.be.equal(null)
       done()
     })
@@ -841,7 +844,7 @@ describe('test runFlow', function () {
     const arr = {
       fun1: null
     }
-    runFlow(arr, Promise, 1).then(data =&gt; {
+    runFlow(arr, 1).then(data =&gt; {
       expect(data.fun1).to.be.equal(null)
       done()
     })
@@ -853,7 +856,7 @@ describe('test runFlow', function () {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Apr 19 2017 20:33:33 GMT+0800 (中国标准时间)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed May 17 2017 10:00:06 GMT+0800 (中国标准时间)
 </div>
 </div>
 <script src="../prettify.js"></script>

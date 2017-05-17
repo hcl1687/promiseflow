@@ -1,6 +1,7 @@
 import type from './type'
+let Promise = null
 
-function series (arr, Promise, inData) {
+function series (arr, inData) {
   if (type(arr) !== 'array') {
     return Promise.resolve(null)
   }
@@ -18,11 +19,11 @@ function series (arr, Promise, inData) {
       })
     } else if (type(item) === 'array') {
       return promise.then(data => {
-        return series(item, Promise, data)
+        return series(item, data)
       })
     } else if (type(item) === 'object') {
       return promise.then(data => {
-        return parallel(item, Promise, data)
+        return parallel(item, data)
       })
     }
 
@@ -30,7 +31,7 @@ function series (arr, Promise, inData) {
   }, Promise.resolve(inData))
 }
 
-function parallel (obj, Promise, inData) {
+function parallel (obj, inData) {
   if (type(obj) !== 'object') {
     return Promise.resolve(null)
   }
@@ -47,9 +48,9 @@ function parallel (obj, Promise, inData) {
     } else if (item && item.then && type(item.then) === 'function') {
       return item
     } else if (type(item) === 'array') {
-      return series(item, Promise, inData)
+      return series(item, inData)
     } else if (type(item) === 'object') {
-      return parallel(item, Promise, inData)
+      return parallel(item, inData)
     }
 
     return Promise.resolve(null)
@@ -65,12 +66,18 @@ function parallel (obj, Promise, inData) {
     })
 }
 
-export default function runFlow (flows, Promise, inData) {
-  if (type(flows) === 'array') {
-    return series(flows, Promise, inData)
-  } else if (type(flows) === 'object') {
-    return parallel(flows, Promise, inData)
+export default function flowFactory (promise) {
+  if (!promise) {
+    throw new Error('should provied a Promise Object')
   }
+  Promise = promise
+  return function runFlow (flows, inData) {
+    if (type(flows) === 'array') {
+      return series(flows, inData)
+    } else if (type(flows) === 'object') {
+      return parallel(flows, inData)
+    }
 
-  return Promise.resolve(null)
+    return Promise.resolve(null)
+  }
 }

@@ -64,7 +64,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _keys2 = _interopRequireDefault(_keys);
 
-	exports.default = runFlow;
+	exports.default = flowFactory;
 
 	var _type = __webpack_require__(36);
 
@@ -72,7 +72,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function series(arr, Promise, inData) {
+	var Promise = null;
+
+	function series(arr, inData) {
 	  if ((0, _type2.default)(arr) !== 'array') {
 	    return Promise.resolve(null);
 	  }
@@ -84,7 +86,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return arr.reduce(function (promise, item) {
 	    if ((0, _type2.default)(item) === 'function') {
 	      return promise.then(item);
-	    } else if (item.then && (0, _type2.default)(item.then) === 'function') {
+	    } else if (item && item.then && (0, _type2.default)(item.then) === 'function') {
 	      return promise.then(function () {
 	        return item;
 	      });
@@ -102,7 +104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, Promise.resolve(inData));
 	}
 
-	function parallel(obj, Promise, inData) {
+	function parallel(obj, inData) {
 	  if ((0, _type2.default)(obj) !== 'object') {
 	    return Promise.resolve(null);
 	  }
@@ -116,7 +118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var item = obj[key];
 	    if ((0, _type2.default)(item) === 'function') {
 	      return item(inData);
-	    } else if (item.then && (0, _type2.default)(item.then) === 'function') {
+	    } else if (item && item.then && (0, _type2.default)(item.then) === 'function') {
 	      return item;
 	    } else if ((0, _type2.default)(item) === 'array') {
 	      return series(item, inData);
@@ -136,14 +138,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	}
 
-	function runFlow(flows, Promise, inData) {
-	  if ((0, _type2.default)(flows) === 'array') {
-	    return series(flows, Promise, inData);
-	  } else if ((0, _type2.default)(flows) === 'object') {
-	    return parallel(flows, Promise, inData);
+	function flowFactory(promise) {
+	  if (!promise) {
+	    throw new Error('should provied a Promise Object');
 	  }
+	  Promise = promise;
+	  return function runFlow(flows, inData) {
+	    if ((0, _type2.default)(flows) === 'array') {
+	      return series(flows, inData);
+	    } else if ((0, _type2.default)(flows) === 'object') {
+	      return parallel(flows, inData);
+	    }
 
-	  return Promise.resolve(null);
+	    return Promise.resolve(null);
+	  };
 	}
 	module.exports = exports['default'];
 
