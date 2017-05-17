@@ -1,4 +1,5 @@
 import type from './type'
+import { reduce, map, forEach, keys as objKeys } from './utils'
 let Promise = null
 
 function series (arr, inData) {
@@ -10,7 +11,7 @@ function series (arr, inData) {
     return Promise.resolve(null)
   }
 
-  return arr.reduce((promise, item) => {
+  return reduce(arr, (promise, item) => {
     if (type(item) === 'function') {
       return promise.then(item)
     } else if (item && item.then && type(item.then) === 'function') {
@@ -36,12 +37,12 @@ function parallel (obj, inData) {
     return Promise.resolve(null)
   }
 
-  const keys = Object.keys(obj)
+  const keys = objKeys(obj)
   if (keys.length === 0) {
     return Promise.resolve(null)
   }
 
-  const arr = keys.map(key => {
+  const arr = map(keys, key => {
     const item = obj[key]
     if (type(item) === 'function') {
       return item(inData)
@@ -59,7 +60,7 @@ function parallel (obj, inData) {
   return Promise.all(arr)
     .then(data => {
       const ret = {}
-      keys.forEach((key, i) => {
+      forEach(keys, (key, i) => {
         ret[key] = data[i]
       })
       return ret

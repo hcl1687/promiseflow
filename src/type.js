@@ -1,8 +1,9 @@
 const types = 'Boolean Number String Function Array Date RegExp Object Error'.split(' ')
 const class2type = {}
-types.forEach(name => {
-  class2type['[object ' + name + ']'] = name.toLowerCase()
-})
+
+for (let i = 0; i < types.length; i++) {
+  class2type['[object ' + types[i] + ']'] = types[i].toLowerCase()
+}
 
 export default function type (obj) {
   if (obj === null) {
