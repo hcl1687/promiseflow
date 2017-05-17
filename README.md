@@ -16,8 +16,9 @@
 ![series](https://raw.githubusercontent.com/hcl1687/promiseflow/master/img/series.png)
 
 ```js
-import runFlow from '../src/index'
+import flowFactory from 'promiseflow'
 import Promise from 'nd-promise'
+const runFlow = flowFactory(Promise)
 
 const initData = 1
 const fun1 = function (data) {
@@ -33,7 +34,7 @@ const fun2 = function (data) {
   })
 }
 const arr = [fun1, fun2]
-runFlow(arr, Promise, initData).then(data => {
+runFlow(arr, initData).then(data => {
   // expect(data).to.be.equal(4)
   done()
 })
@@ -44,8 +45,9 @@ runFlow(arr, Promise, initData).then(data => {
 ![parallel](https://raw.githubusercontent.com/hcl1687/promiseflow/master/img/parallel.png)
 
 ```js
-import runFlow from '../src/index'
+import flowFactory from 'promiseflow'
 import Promise from 'nd-promise'
+const runFlow = flowFactory(Promise)
 
 const initData = 1
 const fun1 = function (data) {
@@ -69,7 +71,7 @@ const fun3 = function (data) {
   })
 }
 const obj = { fun1, fun2, fun3 }
-let promise = runFlow(obj, Promise, initData)
+let promise = runFlow(obj, initData)
 promise.then(data => {
   // expect(data.fun1).to.be.equal(2)
   // expect(data.fun2).to.be.equal(3)
@@ -83,8 +85,9 @@ promise.then(data => {
 ![series_parallel](https://raw.githubusercontent.com/hcl1687/promiseflow/master/img/series_parallel.png)
 
 ```js
-import runFlow from '../src/index'
+import flowFactory from 'promiseflow'
 import Promise from 'nd-promise'
+const runFlow = flowFactory(Promise)
 
 const initData = 1
 const fun1 = function (data) {
@@ -115,7 +118,7 @@ const fun4 = function (data) {
 const arr = [fun1, {
   fun2, fun3
 }, fun4]
-runFlow(arr, Promise, initData).then(data => {
+runFlow(arr, initData).then(data => {
   // expect(data).to.be.equal(9)
   // done()
 })
