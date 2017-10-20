@@ -266,4 +266,128 @@ describe('test runFlow', function () {
       done()
     })
   })
+
+  it('run innerFlow: inData+array', function (done) {
+    const inData = {
+      __flow__: true,
+      flows: [function (data) {
+        expect(data).to.be.equal(1)
+        return data + 1
+      }, function (data) {
+        expect(data).to.be.equal(2)
+        return data + 1
+      }],
+      inData: 1
+    }
+    const fun1 = function (data) {
+      expect(data).to.be.equal(3)
+      return data + 1
+    }
+    const fun2 = function (data) {
+      expect(data).to.be.equal(4)
+      return data + 2
+    }
+    const arr = [fun1, fun2]
+    runFlow(arr, inData).then(data => {
+      expect(data).to.be.equal(6)
+      done()
+    })
+  })
+
+  it('run innerFlow: array', function (done) {
+    const inData = 1
+    const fun1 = function (data) {
+      expect(data).to.be.equal(1)
+      return {
+        __flow__: true,
+        flows: [function (data) {
+          expect(data).to.be.equal(2)
+          return data + 1
+        }, function (data) {
+          expect(data).to.be.equal(3)
+          return data + 1
+        }],
+        inData: data + 1
+      }
+    }
+    const fun2 = function (data) {
+      expect(data).to.be.equal(4)
+      return data + 2
+    }
+    const arr = [fun1, fun2]
+    runFlow(arr, inData).then(data => {
+      expect(data).to.be.equal(6)
+      done()
+    })
+  })
+
+  it('run innerFlow: inData+object', function (done) {
+    const inData = {
+      __flow__: true,
+      flows: {
+        sub1: function (data) {
+          expect(data).to.be.equal(1)
+          return data + 1
+        },
+        sub2: function (data) {
+          expect(data).to.be.equal(1)
+          return data + 2
+        }
+      },
+      inData: 1
+    }
+    const fun1 = function (data) {
+      expect(data.sub1).to.be.equal(2)
+      expect(data.sub2).to.be.equal(3)
+      return data.sub1 + data.sub2 + 1
+    }
+    const fun2 = function (data) {
+      expect(data).to.be.equal(6)
+      return data + 2
+    }
+    const arr = [fun1, fun2]
+    runFlow(arr, inData).then(data => {
+      expect(data).to.be.equal(8)
+      done()
+    })
+  })
+
+  it('run innerFlow: array+object', function (done) {
+    const inData = 1
+    const subFlows = [{
+      sub1: ret => {
+        return ret + 1
+      },
+      sub2: ret => {
+        return ret + 2
+      }
+    }, ret => {
+      return ret.sub1 + ret.sub2
+    }]
+    const fun1 = function (data) {
+      expect(data).to.be.equal(1)
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve({
+            __flow__: true,
+            flows: subFlows,
+            inData: data + 1
+          })
+        }, 50)
+      })
+    }
+    const fun2 = function (data) {
+      expect(data).to.be.equal(7)
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(data + 2)
+        }, 50)
+      })
+    }
+    const arr = [fun1, fun2]
+    runFlow(arr, inData).then(data => {
+      expect(data).to.be.equal(9)
+      done()
+    })
+  })
 })

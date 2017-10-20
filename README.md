@@ -124,5 +124,52 @@ runFlow(arr, initData).then(data => {
 })
 ```
 
+### sub flows demo
+
+![sub_flow](https://raw.githubusercontent.com/hcl1687/promiseflow/master/img/sub_flow.png)
+
+```js
+import flowFactory from 'promiseflow'
+import Promise from 'nd-promise'
+const runFlow = flowFactory(Promise)
+
+const inData = 1
+const subFlows = [{
+  sub1: ret => {
+    return ret + 1
+  },
+  sub2: ret => {
+    return ret + 2
+  }
+}, ret => {
+  return ret.sub1 + ret.sub2
+}]
+const fun1 = function (data) {
+  // expect(data).to.be.equal(1)
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve({
+        __flow__: true,
+        flows: subFlows,
+        inData: data + 1
+      })
+    }, 50)
+  })
+}
+const fun2 = function (data) {
+  // expect(data).to.be.equal(7)
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(data + 2)
+    }, 50)
+  })
+}
+const arr = [fun1, fun2]
+runFlow(arr, inData).then(data => {
+  // expect(data).to.be.equal(9)
+  // done()
+})
+```
+
 ## License
 [MIT](https://opensource.org/licenses/mit-license.php)
