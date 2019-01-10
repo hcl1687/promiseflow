@@ -1,5 +1,5 @@
 import flowFactory from '../src/index'
-import Promise from 'nd-promise'
+import Promise from 'es6-promise'
 const runFlow = flowFactory(Promise)
 
 describe('test runFlow', function () {

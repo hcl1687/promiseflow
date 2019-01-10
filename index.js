@@ -71,6 +71,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Promise = null;
 
+	function handleData(data) {
+	  if (data !== undefined && data !== null && data.__flow__) {
+	    return runFlow(data.flows, data.inData);
+	  }
+	  return data;
+	}
+
 	function series(arr, inData) {
 	  if ((0, _type2.default)(arr) !== 'array') {
 	    return Promise.resolve(null);
@@ -81,6 +88,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  return (0, _utils.reduce)(arr, function (promise, item) {
+	    promise = promise.then(handleData);
+
 	    if ((0, _type2.default)(item) === 'function') {
 	      return promise.then(item);
 	    } else if (item && item.then && (0, _type2.default)(item.then) === 'function') {
@@ -114,9 +123,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var arr = (0, _utils.map)(keys, function (key) {
 	    var item = obj[key];
 	    if ((0, _type2.default)(item) === 'function') {
-	      return item(inData);
+	      return Promise.resolve(handleData(inData)).then(item).then(handleData);
 	    } else if (item && item.then && (0, _type2.default)(item.then) === 'function') {
-	      return item;
+	      return item.then(handleData);
 	    } else if ((0, _type2.default)(item) === 'array') {
 	      return series(item, inData);
 	    } else if ((0, _type2.default)(item) === 'object') {
@@ -135,20 +144,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	}
 
+	function runFlow(flows, inData) {
+	  if ((0, _type2.default)(flows) === 'array') {
+	    return series(flows, inData);
+	  } else if ((0, _type2.default)(flows) === 'object') {
+	    return parallel(flows, inData);
+	  }
+
+	  return Promise.resolve(null);
+	}
+
 	function flowFactory(promise) {
 	  if (!promise) {
 	    throw new Error('should provied a Promise Object');
 	  }
 	  Promise = promise;
-	  return function runFlow(flows, inData) {
-	    if ((0, _type2.default)(flows) === 'array') {
-	      return series(flows, inData);
-	    } else if ((0, _type2.default)(flows) === 'object') {
-	      return parallel(flows, inData);
-	    }
-
-	    return Promise.resolve(null);
-	  };
+	  return runFlow;
 	}
 	module.exports = exports['default'];
 

@@ -1,6 +1,6 @@
 {
   "name": "promiseflow",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -50,6 +50,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "better-npm-run": "0.0.9",
     "chai": "^3.5.0",
+    "es6-promise": "^4.2.5",
     "eslint": "^2.13.1",
     "eslint-config-standard": "^5.3.1",
     "eslint-loader": "^1.4.1",
@@ -67,7 +68,6 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
     "mocha": "^2.5.3",
-    "nd-promise": "^3.1.0",
     "phantomjs-polyfill": "0.0.2",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",

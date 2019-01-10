@@ -17,7 +17,7 @@
 
 ```js
 import flowFactory from 'promiseflow'
-import Promise from 'nd-promise'
+import Promise from 'es6-promise'
 const runFlow = flowFactory(Promise)
 
 const initData = 1
@@ -46,7 +46,7 @@ runFlow(arr, initData).then(data => {
 
 ```js
 import flowFactory from 'promiseflow'
-import Promise from 'nd-promise'
+import Promise from 'es6-promise'
 const runFlow = flowFactory(Promise)
 
 const initData = 1
@@ -86,7 +86,7 @@ promise.then(data => {
 
 ```js
 import flowFactory from 'promiseflow'
-import Promise from 'nd-promise'
+import Promise from 'es6-promise'
 const runFlow = flowFactory(Promise)
 
 const initData = 1
@@ -130,7 +130,7 @@ runFlow(arr, initData).then(data => {
 
 ```js
 import flowFactory from 'promiseflow'
-import Promise from 'nd-promise'
+import Promise from 'es6-promise'
 const runFlow = flowFactory(Promise)
 
 const inData = 1
