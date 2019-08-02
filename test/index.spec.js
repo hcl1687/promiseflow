@@ -236,7 +236,7 @@ describe('test runFlow', function () {
   it('run empty arr', function (done) {
     const arr = []
     runFlow(arr, 1).then(data => {
-      expect(data).to.be.equal(null)
+      expect(data).to.be.equal(1)
       done()
     })
   })
@@ -244,7 +244,7 @@ describe('test runFlow', function () {
   it('run empty obj', function (done) {
     const arr = {}
     runFlow(arr, 1).then(data => {
-      expect(data).to.be.equal(null)
+      expect(data).to.be.equal(1)
       done()
     })
   })

@@ -10,23 +10,23 @@ function handleData (data) {
 }
 
 function series (arr, inData) {
+  inData = Promise.resolve(handleData(inData))
+
   if (type(arr) !== 'array') {
-    return Promise.resolve(null)
+    return inData
   }
 
   if (arr.length === 0) {
-    return Promise.resolve(null)
+    return inData
   }
 
   return reduce(arr, (promise, item) => {
-    promise = promise.then(handleData)
-
     if (type(item) === 'function') {
-      return promise.then(item)
+      return promise.then(item).then(handleData)
     } else if (item && item.then && type(item.then) === 'function') {
       return promise.then(() => {
         return item
-      })
+      }).then(handleData)
     } else if (type(item) === 'array') {
       return promise.then(data => {
         return series(item, data)
@@ -38,42 +38,45 @@ function series (arr, inData) {
     }
 
     return Promise.resolve(null)
-  }, Promise.resolve(inData))
+  }, inData)
 }
 
 function parallel (obj, inData) {
+  const inDataPromise = Promise.resolve(handleData(inData))
   if (type(obj) !== 'object') {
-    return Promise.resolve(null)
+    return inDataPromise
   }
 
   const keys = objKeys(obj)
   if (keys.length === 0) {
-    return Promise.resolve(null)
+    return inDataPromise
   }
 
-  const arr = map(keys, key => {
-    const item = obj[key]
-    if (type(item) === 'function') {
-      return Promise.resolve(handleData(inData)).then(item).then(handleData)
-    } else if (item && item.then && type(item.then) === 'function') {
-      return item.then(handleData)
-    } else if (type(item) === 'array') {
-      return series(item, inData)
-    } else if (type(item) === 'object') {
-      return parallel(item, inData)
-    }
+  return inDataPromise.then((plainData) => {
+    const arr = map(keys, key => {
+      const item = obj[key]
+      if (type(item) === 'function') {
+        return Promise.resolve(plainData).then(item).then(handleData)
+      } else if (item && item.then && type(item.then) === 'function') {
+        return item.then(handleData)
+      } else if (type(item) === 'array') {
+        return series(item, plainData)
+      } else if (type(item) === 'object') {
+        return parallel(item, plainData)
+      }
 
-    return Promise.resolve(null)
-  })
-
-  return Promise.all(arr)
-    .then(data => {
-      const ret = {}
-      forEach(keys, (key, i) => {
-        ret[key] = data[i]
-      })
-      return ret
+      return Promise.resolve(null)
     })
+
+    return Promise.all(arr)
+      .then(data => {
+        const ret = {}
+        forEach(keys, (key, i) => {
+          ret[key] = data[i]
+        })
+        return ret
+      })
+  })
 }
 
 function runFlow (flows, inData) {

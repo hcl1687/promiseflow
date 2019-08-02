@@ -79,23 +79,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function series(arr, inData) {
+	  inData = Promise.resolve(handleData(inData));
+
 	  if ((0, _type2.default)(arr) !== 'array') {
-	    return Promise.resolve(null);
+	    return inData;
 	  }
 
 	  if (arr.length === 0) {
-	    return Promise.resolve(null);
+	    return inData;
 	  }
 
 	  return (0, _utils.reduce)(arr, function (promise, item) {
-	    promise = promise.then(handleData);
-
 	    if ((0, _type2.default)(item) === 'function') {
-	      return promise.then(item);
+	      return promise.then(item).then(handleData);
 	    } else if (item && item.then && (0, _type2.default)(item.then) === 'function') {
 	      return promise.then(function () {
 	        return item;
-	      });
+	      }).then(handleData);
 	    } else if ((0, _type2.default)(item) === 'array') {
 	      return promise.then(function (data) {
 	        return series(item, data);
@@ -107,40 +107,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    return Promise.resolve(null);
-	  }, Promise.resolve(inData));
+	  }, inData);
 	}
 
 	function parallel(obj, inData) {
+	  var inDataPromise = Promise.resolve(handleData(inData));
 	  if ((0, _type2.default)(obj) !== 'object') {
-	    return Promise.resolve(null);
+	    return inDataPromise;
 	  }
 
 	  var keys = (0, _utils.keys)(obj);
 	  if (keys.length === 0) {
-	    return Promise.resolve(null);
+	    return inDataPromise;
 	  }
 
-	  var arr = (0, _utils.map)(keys, function (key) {
-	    var item = obj[key];
-	    if ((0, _type2.default)(item) === 'function') {
-	      return Promise.resolve(handleData(inData)).then(item).then(handleData);
-	    } else if (item && item.then && (0, _type2.default)(item.then) === 'function') {
-	      return item.then(handleData);
-	    } else if ((0, _type2.default)(item) === 'array') {
-	      return series(item, inData);
-	    } else if ((0, _type2.default)(item) === 'object') {
-	      return parallel(item, inData);
-	    }
+	  return inDataPromise.then(function (plainData) {
+	    var arr = (0, _utils.map)(keys, function (key) {
+	      var item = obj[key];
+	      if ((0, _type2.default)(item) === 'function') {
+	        return Promise.resolve(plainData).then(item).then(handleData);
+	      } else if (item && item.then && (0, _type2.default)(item.then) === 'function') {
+	        return item.then(handleData);
+	      } else if ((0, _type2.default)(item) === 'array') {
+	        return series(item, plainData);
+	      } else if ((0, _type2.default)(item) === 'object') {
+	        return parallel(item, plainData);
+	      }
 
-	    return Promise.resolve(null);
-	  });
-
-	  return Promise.all(arr).then(function (data) {
-	    var ret = {};
-	    (0, _utils.forEach)(keys, function (key, i) {
-	      ret[key] = data[i];
+	      return Promise.resolve(null);
 	    });
-	    return ret;
+
+	    return Promise.all(arr).then(function (data) {
+	      var ret = {};
+	      (0, _utils.forEach)(keys, function (key, i) {
+	        ret[key] = data[i];
+	      });
+	      return ret;
+	    });
 	  });
 	}
 
