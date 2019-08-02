@@ -4,12 +4,12 @@ let Promise = null
 
 function handleData (data) {
   if (data !== undefined && data !== null && data.__flow__) {
-    return runFlow(data.flows, data.inData)
+    return runFlow(data.flows, data.inData, data.callback)
   }
   return data
 }
 
-function series (arr, inData) {
+function series (arr, inData, callback) {
   inData = Promise.resolve(handleData(inData))
 
   if (type(arr) !== 'array') {
@@ -20,7 +20,10 @@ function series (arr, inData) {
     return inData
   }
 
-  return reduce(arr, (promise, item) => {
+  return reduce(arr, (promise, item, index) => {
+    if (callback) {
+      item = callback(item, index, arr)
+    }
     if (type(item) === 'function') {
       return promise.then(item).then(handleData)
     } else if (item && item.then && type(item.then) === 'function') {
@@ -29,11 +32,11 @@ function series (arr, inData) {
       }).then(handleData)
     } else if (type(item) === 'array') {
       return promise.then(data => {
-        return series(item, data)
+        return series(item, data, callback)
       })
     } else if (type(item) === 'object') {
       return promise.then(data => {
-        return parallel(item, data)
+        return parallel(item, data, callback)
       })
     }
 
@@ -41,7 +44,7 @@ function series (arr, inData) {
   }, inData)
 }
 
-function parallel (obj, inData) {
+function parallel (obj, inData, callback) {
   const inDataPromise = Promise.resolve(handleData(inData))
   if (type(obj) !== 'object') {
     return inDataPromise
@@ -54,15 +57,19 @@ function parallel (obj, inData) {
 
   return inDataPromise.then((plainData) => {
     const arr = map(keys, key => {
-      const item = obj[key]
+      let item = obj[key]
+      if (callback) {
+        item = callback(item, key, obj)
+      }
+
       if (type(item) === 'function') {
         return Promise.resolve(plainData).then(item).then(handleData)
       } else if (item && item.then && type(item.then) === 'function') {
         return item.then(handleData)
       } else if (type(item) === 'array') {
-        return series(item, plainData)
+        return series(item, plainData, callback)
       } else if (type(item) === 'object') {
-        return parallel(item, plainData)
+        return parallel(item, plainData, callback)
       }
 
       return Promise.resolve(null)
@@ -79,14 +86,14 @@ function parallel (obj, inData) {
   })
 }
 
-function runFlow (flows, inData) {
+function runFlow (flows, inData, callback) {
   if (type(flows) === 'array') {
-    return series(flows, inData)
+    return series(flows, inData, callback)
   } else if (type(flows) === 'object') {
-    return parallel(flows, inData)
+    return parallel(flows, inData, callback)
   }
 
-  return Promise.resolve(null)
+  return Promise.resolve(handleData(inData))
 }
 
 export default function flowFactory (promise) {

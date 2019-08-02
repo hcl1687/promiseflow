@@ -22,8 +22,13 @@ module.exports = function (config) {
         watched: false,
         served: true,
         included: true
-      }
+      },
+      { pattern: 'img/**/*.png', watched: false, included: false, served: true }
     ],
+
+    proxies: {
+      '/img': 'http://localhost:9876/base/img'
+    },
 
     // list of files to exclude
     exclude: [

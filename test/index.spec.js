@@ -228,7 +228,7 @@ describe('test runFlow', function () {
 
   it('run null', function (done) {
     runFlow(null, 1).then(data => {
-      expect(data).to.be.equal(null)
+      expect(data).to.be.equal(1)
       done()
     })
   })
@@ -387,6 +387,87 @@ describe('test runFlow', function () {
     const arr = [fun1, fun2]
     runFlow(arr, inData).then(data => {
       expect(data).to.be.equal(9)
+      done()
+    })
+  })
+
+  it('run arr obj deferred with callback', function (done) {
+    const arr = [1, {
+      fun2: 2, fun3: 3
+    }, 4]
+    const callback = (val, key, source) => {
+      if (source === arr && key === 0) {
+        return (data) => {
+          expect(data).to.be.equal(1)
+          return data + val
+        }
+      } else if (key === 'fun2') {
+        return (data) => {
+          expect(data).to.be.equal(2)
+          return new Promise(resolve => {
+            setTimeout(() => {
+              resolve(data + val)
+            }, 50)
+          })
+        }
+      } else if (key === 'fun3') {
+        return (data) => {
+          expect(data).to.be.equal(2)
+          return new Promise(resolve => {
+            setTimeout(() => {
+              resolve(data + val)
+            }, 50)
+          })
+        }
+      } else if (source === arr && key === 2) {
+        return (data) => {
+          expect(data.fun2).to.be.equal(4)
+          expect(data.fun3).to.be.equal(5)
+          return data.fun2 + data.fun3
+        }
+      }
+
+      return val
+    }
+    runFlow(arr, 1, callback).then(data => {
+      expect(data).to.be.equal(9)
+      done()
+    })
+  })
+
+  it('callback demo', function (done) {
+    const arr = ['series.png', {
+      img1: 'parallel.png',
+      img2: 'series_parallel.png'
+    }, 'sub_flow.png']
+    const callback = (val) => {
+      if (typeof val === 'string') {
+        return function () {
+          return new Promise((resolve, reject) => {
+            const img = document.createElement('img')
+            img.id = val
+            img.onload = () => {
+              img.onload = null
+              img.onerror = null
+              resolve(img.name)
+            }
+            img.onerror = () => {
+              img.onload = null
+              img.onerror = null
+              reject(new Error(`${val} load failed`))
+            }
+
+            img.src = `/base/img/${val}`
+
+            document.body.appendChild(img)
+          })
+        }
+      }
+
+      return val
+    }
+    runFlow(arr, '', callback).then(data => {
+      expect(true).to.be.equal(true)
       done()
     })
   })

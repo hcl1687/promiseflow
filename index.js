@@ -73,12 +73,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function handleData(data) {
 	  if (data !== undefined && data !== null && data.__flow__) {
-	    return runFlow(data.flows, data.inData);
+	    return runFlow(data.flows, data.inData, data.callback);
 	  }
 	  return data;
 	}
 
-	function series(arr, inData) {
+	function series(arr, inData, callback) {
 	  inData = Promise.resolve(handleData(inData));
 
 	  if ((0, _type2.default)(arr) !== 'array') {
@@ -89,7 +89,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return inData;
 	  }
 
-	  return (0, _utils.reduce)(arr, function (promise, item) {
+	  return (0, _utils.reduce)(arr, function (promise, item, index) {
+	    if (callback) {
+	      item = callback(item, index, arr);
+	    }
 	    if ((0, _type2.default)(item) === 'function') {
 	      return promise.then(item).then(handleData);
 	    } else if (item && item.then && (0, _type2.default)(item.then) === 'function') {
@@ -98,11 +101,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }).then(handleData);
 	    } else if ((0, _type2.default)(item) === 'array') {
 	      return promise.then(function (data) {
-	        return series(item, data);
+	        return series(item, data, callback);
 	      });
 	    } else if ((0, _type2.default)(item) === 'object') {
 	      return promise.then(function (data) {
-	        return parallel(item, data);
+	        return parallel(item, data, callback);
 	      });
 	    }
 
@@ -110,7 +113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, inData);
 	}
 
-	function parallel(obj, inData) {
+	function parallel(obj, inData, callback) {
 	  var inDataPromise = Promise.resolve(handleData(inData));
 	  if ((0, _type2.default)(obj) !== 'object') {
 	    return inDataPromise;
@@ -124,14 +127,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return inDataPromise.then(function (plainData) {
 	    var arr = (0, _utils.map)(keys, function (key) {
 	      var item = obj[key];
+	      if (callback) {
+	        item = callback(item, key, obj);
+	      }
+
 	      if ((0, _type2.default)(item) === 'function') {
 	        return Promise.resolve(plainData).then(item).then(handleData);
 	      } else if (item && item.then && (0, _type2.default)(item.then) === 'function') {
 	        return item.then(handleData);
 	      } else if ((0, _type2.default)(item) === 'array') {
-	        return series(item, plainData);
+	        return series(item, plainData, callback);
 	      } else if ((0, _type2.default)(item) === 'object') {
-	        return parallel(item, plainData);
+	        return parallel(item, plainData, callback);
 	      }
 
 	      return Promise.resolve(null);
@@ -147,14 +154,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	}
 
-	function runFlow(flows, inData) {
+	function runFlow(flows, inData, callback) {
 	  if ((0, _type2.default)(flows) === 'array') {
-	    return series(flows, inData);
+	    return series(flows, inData, callback);
 	  } else if ((0, _type2.default)(flows) === 'object') {
-	    return parallel(flows, inData);
+	    return parallel(flows, inData, callback);
 	  }
 
-	  return Promise.resolve(null);
+	  return Promise.resolve(handleData(inData));
 	}
 
 	function flowFactory(promise) {

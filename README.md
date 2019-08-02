@@ -171,5 +171,48 @@ runFlow(arr, inData).then(data => {
 })
 ```
 
+### use callback to handle each task
+
+```js
+import flowFactory from 'promiseflow'
+import Promise from 'es6-promise'
+const runFlow = flowFactory(Promise)
+
+const arr = ['series.png', {
+  img1: 'parallel.png',
+  img2: 'series_parallel.png'
+}, 'sub_flow.png']
+const callback = (val) => {
+  if (typeof val === 'string') {
+    return function () {
+      return new Promise((resolve, reject) => {
+        const img = document.createElement('img')
+        img.id = val
+        img.onload = () => {
+          img.onload = null
+          img.onerror = null
+          resolve(img.name)
+        }
+        img.onerror = () => {
+          img.onload = null
+          img.onerror = null
+          reject(new Error(`${val} load failed`))
+        }
+
+        img.src = `/base/img/${val}`
+
+        document.body.appendChild(img)
+      })
+    }
+  }
+
+  return val
+}
+runFlow(arr, '', callback).then(data => {
+  // expect(true).to.be.equal(true)
+  done()
+})
+```
+
 ## License
 [MIT](https://opensource.org/licenses/mit-license.php)
