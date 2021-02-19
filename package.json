@@ -1,8 +1,9 @@
 {
   "name": "promiseflow",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "test": "better-npm-run test",
     "compile": "better-npm-run compile"
